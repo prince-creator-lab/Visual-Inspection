@@ -1,228 +1,366 @@
-# Vegetable Classification Flask App
+# Vegetable Quality Inspector
 
-A modern Flask web application that classifies vegetable images using TensorFlow Lite models. The app provides both a web interface and REST API endpoints for image classification.
+A comprehensive Flask web application for AI-powered vegetable quality assessment using TensorFlow Lite. The system provides both camera capture and file upload capabilities with real-time quality analysis.
 
-## Features
+## ✨ Features
 
-- 🌱 **AI-Powered Classification**: Uses TensorFlow Lite for efficient inference
-- 🖼️ **Image Upload**: Supports multiple image formats (PNG, JPG, JPEG, GIF, BMP, WebP)
-- 🎨 **Modern UI**: Beautiful, responsive web interface with Bootstrap
-- 🔧 **REST API**: RESTful endpoints for programmatic access
-- 📊 **Confidence Scores**: Returns prediction confidence and top 5 predictions
-- 🛡️ **Error Handling**: Comprehensive error handling and validation
-- 📱 **Mobile Friendly**: Responsive design works on all devices
+### Core Functionality
+- **🎥 Camera Integration**: Real-time camera capture with auto-focus and orientation handling
+- **📁 File Upload**: Support for multiple image formats with corruption detection
+- **🤖 AI-Powered Analysis**: TensorFlow Lite model for efficient quality assessment
+- **📊 Quality Scoring**: Comprehensive quality assessment with 4-tier classification
+- **� Vegetable Recognition**: Identifies 15 different vegetable types
+- **⚡ Real-time Processing**: Fast inference with optimized preprocessing
+- **📱 Mobile-Friendly**: Responsive design with camera API support
 
-## Supported Vegetable Classes
+### Technical Features
+- **🛡️ Robust Error Handling**: Comprehensive error handling for corrupt images
+- **🔐 Security**: File type validation, size limits, and secure processing
+- **📱 Progressive Web App**: Modern web technologies with offline capability
+- **🎨 Modern UI**: Beautiful, accessible interface with Bootstrap 5
+- **🔄 Real-time Updates**: Live camera feed with instant capture
+- **📈 Performance Optimized**: Efficient image processing and model inference
 
-The model supports classification of 15 vegetable types:
-- Bean
-- Bitter Gourd
-- Bottle Gourd
-- Brinjal (Eggplant)
-- Broccoli
-- Cabbage
-- Capsicum (Bell Pepper)
-- Carrot
-- Cauliflower
-- Cucumber
-- Papaya
-- Potato
-- Pumpkin
-- Radish
-- Tomato
+## 🥬 Supported Vegetables
 
-## Installation
+The system can identify and assess quality for these vegetable types:
+
+| Category | Vegetables |
+|----------|------------|
+| **Leafy Greens** | Lettuce, Spinach, Cabbage |
+| **Roots & Tubers** | Carrot, Potato, Radish, Onion |
+| **Cruciferous** | Broccoli, Cauliflower |
+| **Fruiting** | Tomato, Bell Pepper, Cucumber, Eggplant |
+| **Squash** | Zucchini |
+| **Legumes** | Bean |
+
+## 🏷️ Quality Categories
+
+| Quality | Score Range | Description | Recommendation |
+|---------|-------------|-------------|----------------|
+| **Fresh** | 80-100 | Excellent quality | Ready for consumption |
+| **Good** | 60-79 | Good quality | Consume soon |
+| **Fair** | 40-59 | Fair quality | Check before consumption |
+| **Poor** | 0-39 | Poor quality | Not recommended |
+
+## 🚀 Quick Start
 
 ### Prerequisites
-
-- Python 3.8 or higher
+- Python 3.10 or higher
 - pip package manager
+- Modern web browser with camera support
+- TensorFlow Lite model file
 
-### Setup
+### Installation
 
-1. **Clone or download the project files**
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd vegetable-quality-inspector
+   ```
 
-2. **Install dependencies**:
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Add your TensorFlow Lite model**:
-   - Place your trained TFLite model file in the project root
-   - Name it `model.tflite` or update the `MODEL_PATH` in `app.py`
-   - Ensure your model expects input size 150x150x3 and outputs 15 classes
+3. **Add your TensorFlow Lite model**
+   - Place your trained model file as `vegetable_quality_model.tflite` in the project root
+   - Ensure the model expects 150x150 RGB input and outputs 15 classes
 
-4. **Run the application**:
+4. **Run the application**
    ```bash
    python app.py
    ```
 
-5. **Access the app**:
+5. **Access the application**
    - Open your browser and navigate to `http://localhost:5000`
-   - The web interface will be available immediately
+   - Allow camera permissions when prompted
+   - Start inspecting vegetables!
 
-## Usage
+## 🖥️ Usage
 
 ### Web Interface
 
-1. **Upload Image**: Click "Select Vegetable Image" and choose an image file
-2. **Classify**: Click "Upload & Classify" to process the image
-3. **View Results**: See the predicted class, confidence score, and top 5 predictions
+1. **Camera Capture**
+   - Click "Start Camera" to begin camera feed
+   - Position vegetable in frame
+   - Click "Capture" to take photo
+   - Click "Inspect Quality" to analyze
 
-### REST API
+2. **File Upload**
+   - Click "Or Upload Image File"
+   - Select image from your device
+   - Preview will appear automatically
+   - Click "Inspect Quality" to analyze
 
-#### Upload and Classify Image
+3. **Results**
+   - View vegetable type identification
+   - See quality assessment with score
+   - Check detailed predictions
+   - Review timestamp and confidence
 
-**Endpoint**: `POST /predict`
+### API Endpoints
 
-**Request**:
+#### Quality Inspection
 ```bash
-curl -X POST -F "file=@vegetable_image.jpg" http://localhost:5000/predict
+POST /inspect
+Content-Type: multipart/form-data (for file upload)
+Content-Type: application/json (for camera capture)
+
+# File upload example
+curl -X POST -F "file=@vegetable.jpg" http://localhost:5000/inspect
+
+# Camera capture example
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"image": "data:image/jpeg;base64,/9j/4AAQ..."}' \
+  http://localhost:5000/inspect
 ```
 
-**Response**:
+**Response:**
 ```json
 {
   "success": true,
-  "predicted_class": "Tomato",
-  "confidence": 0.9234,
-  "all_predictions": [
-    {"class": "Tomato", "confidence": 0.9234},
-    {"class": "Capsicum", "confidence": 0.0456},
-    {"class": "Brinjal", "confidence": 0.0234},
-    {"class": "Potato", "confidence": 0.0123},
-    {"class": "Carrot", "confidence": 0.0089}
+  "vegetable_type": "Tomato",
+  "quality_category": "fresh",
+  "quality_info": {
+    "label": "Fresh",
+    "color": "#28a745",
+    "description": "Excellent quality, ready for consumption"
+  },
+  "quality_score": 85,
+  "confidence": 0.8456,
+  "vegetable_predictions": [
+    {"vegetable": "Tomato", "confidence": 0.8456},
+    {"vegetable": "Bell_Pepper", "confidence": 0.0892},
+    {"vegetable": "Eggplant", "confidence": 0.0234}
   ],
-  "filename": "vegetable_image.jpg"
+  "timestamp": "2024-01-15T10:30:45.123456",
+  "filename": "captured_image.jpg"
 }
 ```
 
-#### Get Supported Classes
+#### System Information
+```bash
+# Get supported vegetables
+GET /vegetables
 
-**Endpoint**: `GET /classes`
+# Get quality categories
+GET /quality-categories
 
-**Response**:
-```json
-{
-  "classes": ["Bean", "Bitter_Gourd", "Bottle_Gourd", ...]
-}
+# Health check
+GET /health
 ```
 
-#### Health Check
+## 🛠️ Configuration
 
-**Endpoint**: `GET /health`
-
-**Response**:
-```json
-{
-  "status": "healthy",
-  "model_loaded": true,
-  "supported_formats": ["png", "jpg", "jpeg", "gif", "bmp", "webp"],
-  "max_file_size_mb": 16.0,
-  "num_classes": 15
-}
+### Environment Variables
+```bash
+export SECRET_KEY=your-secret-key-here
+export FLASK_ENV=production
+export MODEL_PATH=path/to/your/model.tflite
 ```
 
-## API Error Responses
-
-All errors return JSON with an error message:
-
-```json
-{
-  "error": "Error description"
-}
-```
-
-Common error codes:
-- `400`: Bad request (invalid file, missing file, etc.)
-- `413`: File too large (>16MB)
-- `500`: Internal server error
-
-## Configuration
-
-You can modify these settings in `app.py`:
-
+### Application Settings
 ```python
-# File upload settings
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-app.config['UPLOAD_FOLDER'] = 'uploads'
-
-# Model settings
-app.config['MODEL_PATH'] = 'model.tflite'
-
-# Supported file extensions
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp'}
-
-# Update these with your actual class names
-VEGETABLE_CLASSES = [
-    'Bean', 'Bitter_Gourd', 'Bottle_Gourd', 'Brinjal', 'Broccoli',
-    'Cabbage', 'Capsicum', 'Carrot', 'Cauliflower', 'Cucumber',
-    'Papaya', 'Potato', 'Pumpkin', 'Radish', 'Tomato'
-]
+# In app.py
+app.config.update(
+    MAX_CONTENT_LENGTH=32 * 1024 * 1024,  # 32MB max file size
+    UPLOAD_FOLDER='uploads',
+    MODEL_PATH='vegetable_quality_model.tflite',
+    TEMP_FOLDER='temp'
+)
 ```
 
-## Model Requirements
-
-Your TensorFlow Lite model should:
-- Accept input shape: `(1, 150, 150, 3)` (batch_size, height, width, channels)
-- Expect normalized input values in range [0, 1]
-- Output 15 class probabilities
-- Be saved as a `.tflite` file
-
-## Production Deployment
-
-For production deployment, consider:
-
-1. **Use a production WSGI server**:
-   ```bash
-   gunicorn -w 4 -b 0.0.0.0:5000 app:app
-   ```
-
-2. **Set environment variables**:
-   ```bash
-   export FLASK_ENV=production
-   export SECRET_KEY=your-secret-key-here
-   ```
-
-3. **Enable HTTPS** and configure proper security headers
-4. **Set up monitoring** and logging
-5. **Configure file storage** for uploaded images if needed
-
-## File Structure
+## 📁 Project Structure
 
 ```
-├── app.py                 # Main Flask application
-├── requirements.txt       # Python dependencies
-├── model.tflite          # Your TensorFlow Lite model (add this)
+vegetable-quality-inspector/
+├── app.py                          # Main Flask application
+├── requirements.txt                # Python dependencies
+├── README.md                       # This file
+├── vegetable_quality_model.tflite  # Your TensorFlow Lite model
 ├── templates/
-│   └── index.html        # Web interface template
+│   └── index.html                  # Web interface
 ├── static/
 │   └── css/
-│       └── style.css     # Custom CSS styles
-├── uploads/              # Upload directory (created automatically)
-└── README.md            # This file
+│       └── quality-inspector.css   # Custom styling
+├── uploads/                        # File upload directory
+├── temp/                           # Temporary files
+├── logs/                           # Application logs
+└── quality_inspector.log          # Log file
 ```
 
-## Troubleshooting
+## 🔧 Model Requirements
+
+Your TensorFlow Lite model should meet these specifications:
+
+### Input Requirements
+- **Shape**: `(1, 150, 150, 3)` - batch size, height, width, channels
+- **Data Type**: `float32`
+- **Range**: Normalized values [0, 1]
+- **Format**: RGB color space
+
+### Output Requirements
+- **Shape**: `(1, 15)` - batch size, number of classes
+- **Data Type**: `float32`
+- **Range**: Probability scores [0, 1]
+- **Order**: Must match VEGETABLE_TYPES order in app.py
+
+### Model Training Tips
+- Use data augmentation for better generalization
+- Include various lighting conditions
+- Train with different vegetable quality levels
+- Implement proper validation splits
+- Consider transfer learning from pre-trained models
+
+## 🚀 Deployment
+
+### Development Server
+```bash
+python app.py
+```
+
+### Production Deployment
+```bash
+# Using Gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+
+# Using Docker
+docker build -t vegetable-quality-inspector .
+docker run -p 5000:5000 vegetable-quality-inspector
+```
+
+### Environment Setup
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+## 🧪 Testing
+
+### Manual Testing
+1. Test camera functionality on different devices
+2. Upload various image formats
+3. Test with corrupted image files
+4. Verify quality assessment accuracy
+5. Check responsive design on mobile
+
+### API Testing
+```bash
+# Test health endpoint
+curl http://localhost:5000/health
+
+# Test with sample image
+curl -X POST -F "file=@test_images/tomato.jpg" http://localhost:5000/inspect
+```
+
+## 🔍 Troubleshooting
 
 ### Common Issues
 
-1. **Model not found**: Ensure `model.tflite` exists in the project root
-2. **Import errors**: Install all dependencies with `pip install -r requirements.txt`
-3. **File upload fails**: Check file size (<16MB) and format (supported extensions)
-4. **Prediction errors**: Verify your model input/output format matches the expected shape
+1. **Model Not Loading**
+   - Check file path: `vegetable_quality_model.tflite`
+   - Verify model format and compatibility
+   - Check file permissions
 
-### Logs
+2. **Camera Not Working**
+   - Verify browser permissions
+   - Check HTTPS for camera access
+   - Test on different browsers
 
-The application logs important information to the console. Check for:
-- Model loading status
-- Image preprocessing errors
-- Prediction failures
+3. **Image Upload Failures**
+   - Check file size (max 32MB)
+   - Verify supported formats
+   - Test with different image types
 
-## License
+4. **Quality Assessment Issues**
+   - Verify model input/output shapes
+   - Check image preprocessing
+   - Review vegetable type mappings
 
-This project is provided as-is for educational and development purposes.
+### Log Files
+- Application logs: `quality_inspector.log`
+- Error tracking: Check browser console
+- Network issues: Verify API endpoints
 
-## Contributing
+## 📊 Performance Optimization
 
-Feel free to fork this project and submit pull requests for improvements!
+### Frontend Optimizations
+- Lazy loading for large images
+- Image compression before upload
+- Efficient DOM manipulation
+- Optimized CSS and JavaScript
+
+### Backend Optimizations
+- Model caching and reuse
+- Efficient image preprocessing
+- Asynchronous processing
+- Memory management
+
+### Infrastructure
+- CDN for static assets
+- Load balancing for high traffic
+- Database optimization
+- Caching strategies
+
+## 🔒 Security Considerations
+
+### File Upload Security
+- File type validation
+- Size limitations
+- Virus scanning (recommended)
+- Secure file storage
+
+### API Security
+- Rate limiting
+- Input validation
+- CORS configuration
+- HTTPS enforcement
+
+### Data Privacy
+- No permanent storage of images
+- Temporary file cleanup
+- User consent for camera access
+- GDPR compliance considerations
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+### Development Guidelines
+- Follow PEP 8 style guidelines
+- Add comprehensive tests
+- Update documentation
+- Ensure mobile compatibility
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- TensorFlow team for TensorFlow Lite
+- Bootstrap team for responsive framework
+- Font Awesome for icons
+- OpenCV community for image processing insights
+
+## 📞 Support
+
+For support and questions:
+- Create an issue on GitHub
+- Check the troubleshooting section
+- Review the API documentation
+- Test with provided examples
+
+---
+
+**Made with ❤️ for better vegetable quality assessment**

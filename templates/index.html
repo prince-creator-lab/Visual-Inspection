@@ -3,93 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vegetable Classification App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <title>Vegetable Quality Inspector</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/quality-inspector.css') }}" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container-fluid py-4">
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-lg">
-                    <div class="card-header bg-success text-white text-center">
-                        <h1 class="mb-0">
-                            <i class="fas fa-leaf"></i> Vegetable Classification
-                        </h1>
-                        <p class="mb-0">Upload an image to classify vegetables using AI</p>
-                    </div>
-                    <div class="card-body">
-                        <!-- Upload Form -->
-                        <form id="uploadForm" enctype="multipart/form-data" class="mb-4">
-                            <div class="mb-3">
-                                <label for="imageFile" class="form-label">
-                                    <i class="fas fa-image"></i> Select Vegetable Image
-                                </label>
-                                <input type="file" class="form-control" id="imageFile" name="file" 
-                                       accept="image/*" required>
-                                <div class="form-text">
-                                    Supported formats: PNG, JPG, JPEG, GIF, BMP, WebP (Max: 16MB)
+            <div class="col-lg-10">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h1 class="display-4 text-primary">
+                        <i class="fas fa-search-plus"></i> Vegetable Quality Inspector
+                    </h1>
+                    <p class="lead text-muted">AI-powered vegetable quality assessment using advanced machine learning</p>
+                </div>
+
+                <!-- Main Content -->
+                <div class="row">
+                    <!-- Camera/Upload Section -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-camera"></i> Image Capture & Upload
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Camera Section -->
+                                <div class="camera-section mb-4">
+                                    <div class="text-center">
+                                        <video id="cameraFeed" class="camera-preview d-none" autoplay playsinline></video>
+                                        <canvas id="captureCanvas" class="d-none"></canvas>
+                                        <div id="cameraPlaceholder" class="camera-placeholder">
+                                            <i class="fas fa-camera fa-3x text-muted"></i>
+                                            <p class="mt-2 text-muted">Camera feed will appear here</p>
+                                        </div>
+                                    </div>
+                                    <div class="camera-controls mt-3">
+                                        <button id="startCameraBtn" class="btn btn-success me-2">
+                                            <i class="fas fa-video"></i> Start Camera
+                                        </button>
+                                        <button id="captureBtn" class="btn btn-primary me-2 d-none">
+                                            <i class="fas fa-camera"></i> Capture
+                                        </button>
+                                        <button id="stopCameraBtn" class="btn btn-danger d-none">
+                                            <i class="fas fa-stop"></i> Stop Camera
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <!-- File Upload Section -->
+                                <div class="upload-section">
+                                    <div class="mb-3">
+                                        <label for="fileInput" class="form-label">
+                                            <i class="fas fa-file-image"></i> Or Upload Image File
+                                        </label>
+                                        <input type="file" class="form-control" id="fileInput" 
+                                               accept="image/*" aria-describedby="fileHelp">
+                                        <div id="fileHelp" class="form-text">
+                                            Supported formats: PNG, JPG, JPEG, GIF, BMP, WebP, TIFF (Max: 32MB)
+                                        </div>
+                                    </div>
+                                    <button id="uploadBtn" class="btn btn-success btn-lg w-100" disabled>
+                                        <i class="fas fa-upload"></i> Inspect Quality
+                                    </button>
+                                </div>
+
+                                <!-- Image Preview -->
+                                <div id="imagePreview" class="mt-3 d-none">
+                                    <div class="text-center">
+                                        <p class="text-muted mb-2">Preview:</p>
+                                        <img id="previewImg" class="img-fluid rounded preview-image" 
+                                             alt="Image preview">
+                                    </div>
+                                </div>
+
+                                <!-- Loading Animation -->
+                                <div id="loadingSpinner" class="text-center mt-3 d-none">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Analyzing...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">Analyzing vegetable quality...</p>
                                 </div>
                             </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-success btn-lg">
-                                    <i class="fas fa-upload"></i> Upload & Classify
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- Loading Spinner -->
-                        <div id="loadingSpinner" class="text-center d-none">
-                            <div class="spinner-border text-success" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>
-                            <p class="mt-2">Analyzing image...</p>
                         </div>
+                    </div>
 
-                        <!-- Image Preview -->
-                        <div id="imagePreview" class="text-center mb-4 d-none">
-                            <img id="previewImg" class="img-fluid rounded shadow" 
-                                 style="max-height: 300px;" alt="Uploaded image">
-                        </div>
-
-                        <!-- Results -->
-                        <div id="results" class="d-none">
-                            <h3 class="mb-3">
-                                <i class="fas fa-chart-bar"></i> Classification Results
-                            </h3>
-                            <div id="mainResult" class="alert alert-success">
-                                <h4 class="alert-heading">
-                                    <i class="fas fa-check-circle"></i> 
-                                    Predicted: <span id="predictedClass"></span>
-                                </h4>
-                                <p class="mb-0">
-                                    Confidence: <span id="confidence"></span>%
-                                </p>
+                    <!-- Results Section -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chart-line"></i> Quality Assessment Results
+                                </h5>
                             </div>
-                            
-                            <h5>Top 5 Predictions:</h5>
-                            <div id="allPredictions" class="row"></div>
-                        </div>
+                            <div class="card-body">
+                                <div id="noResults" class="text-center text-muted py-5">
+                                    <i class="fas fa-clipboard-check fa-3x mb-3"></i>
+                                    <p>Upload an image or use camera to get quality assessment results</p>
+                                </div>
 
-                        <!-- Error Messages -->
-                        <div id="errorMessage" class="alert alert-danger d-none">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span id="errorText"></span>
+                                <div id="resultsContainer" class="d-none">
+                                    <!-- Main Quality Result -->
+                                    <div id="mainResult" class="quality-result mb-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-8">
+                                                <h6 class="text-muted mb-1">Vegetable Type</h6>
+                                                <h4 id="vegetableType" class="mb-2"></h4>
+                                                <h6 class="text-muted mb-1">Quality Assessment</h6>
+                                                <h3 id="qualityCategory" class="mb-2"></h3>
+                                                <p id="qualityDescription" class="text-muted"></p>
+                                            </div>
+                                            <div class="col-4 text-center">
+                                                <div class="quality-score-circle">
+                                                    <span id="qualityScore" class="score-number"></span>
+                                                    <small class="score-label">Score</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Detailed Predictions -->
+                                    <div class="mb-4">
+                                        <h6 class="text-muted mb-3">Vegetable Type Predictions</h6>
+                                        <div id="vegetablePredictions"></div>
+                                    </div>
+
+                                    <!-- Timestamp -->
+                                    <div class="text-muted small">
+                                        <i class="fas fa-clock"></i> Analyzed: <span id="timestamp"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Supported Classes -->
-                <div class="card mt-4">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list"></i> Supported Vegetable Classes
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="supportedClasses" class="row">
-                            <!-- Will be populated by JavaScript -->
+                <!-- Error Messages -->
+                <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="errorMessage"></span>
+                </div>
+
+                <!-- System Status -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-info-circle"></i> System Information
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Supported Vegetables</h6>
+                                        <div id="supportedVegetables" class="d-flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-muted">Quality Categories</h6>
+                                        <div id="qualityCategories" class="d-flex flex-wrap gap-1"></div>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-12">
+                                        <small class="text-muted">
+                                            <i class="fas fa-heartbeat"></i> System Status: 
+                                            <span id="systemStatus" class="badge bg-secondary">Checking...</span>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,119 +185,361 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Load supported classes on page load
+        // Global variables
+        let cameraStream = null;
+        let capturedImageData = null;
+        let currentImageFile = null;
+
+        // DOM elements
+        const elements = {
+            cameraFeed: document.getElementById('cameraFeed'),
+            captureCanvas: document.getElementById('captureCanvas'),
+            cameraPlaceholder: document.getElementById('cameraPlaceholder'),
+            startCameraBtn: document.getElementById('startCameraBtn'),
+            captureBtn: document.getElementById('captureBtn'),
+            stopCameraBtn: document.getElementById('stopCameraBtn'),
+            fileInput: document.getElementById('fileInput'),
+            uploadBtn: document.getElementById('uploadBtn'),
+            imagePreview: document.getElementById('imagePreview'),
+            previewImg: document.getElementById('previewImg'),
+            loadingSpinner: document.getElementById('loadingSpinner'),
+            noResults: document.getElementById('noResults'),
+            resultsContainer: document.getElementById('resultsContainer'),
+            errorAlert: document.getElementById('errorAlert'),
+            errorMessage: document.getElementById('errorMessage')
+        };
+
+        // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
-            loadSupportedClasses();
+            initializeApp();
+            setupEventListeners();
         });
 
-        // Load supported classes
-        function loadSupportedClasses() {
-            fetch('/classes')
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById('supportedClasses');
-                    container.innerHTML = '';
-                    
-                    data.classes.forEach(className => {
-                        const col = document.createElement('div');
-                        col.className = 'col-md-3 col-sm-4 col-6 mb-2';
-                        col.innerHTML = `<span class="badge bg-secondary">${className}</span>`;
-                        container.appendChild(col);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading classes:', error);
-                });
+        function initializeApp() {
+            loadSystemInformation();
+            checkSystemHealth();
         }
 
-        // Handle file selection
-        document.getElementById('imageFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').classList.remove('d-none');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        function setupEventListeners() {
+            // Camera controls
+            elements.startCameraBtn.addEventListener('click', startCamera);
+            elements.captureBtn.addEventListener('click', captureImage);
+            elements.stopCameraBtn.addEventListener('click', stopCamera);
 
-        // Handle form submission
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // File upload
+            elements.fileInput.addEventListener('change', handleFileSelect);
+            elements.uploadBtn.addEventListener('click', processImage);
+
+            // Error handling for image corruption
+            elements.previewImg.addEventListener('error', function() {
+                showError('Selected image appears to be corrupted or invalid');
+                resetUploadState();
+            });
+        }
+
+        // Camera functions
+        async function startCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: 'environment', // Use back camera if available
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                };
+
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                elements.cameraFeed.srcObject = cameraStream;
+                
+                elements.cameraFeed.classList.remove('d-none');
+                elements.cameraPlaceholder.classList.add('d-none');
+                elements.startCameraBtn.classList.add('d-none');
+                elements.captureBtn.classList.remove('d-none');
+                elements.stopCameraBtn.classList.remove('d-none');
+
+                hideError();
+            } catch (error) {
+                console.error('Error accessing camera:', error);
+                showError('Unable to access camera. Please check permissions or try file upload.');
+            }
+        }
+
+        function captureImage() {
+            const canvas = elements.captureCanvas;
+            const context = canvas.getContext('2d');
+            const video = elements.cameraFeed;
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+
+            // Convert to base64
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.8);
             
-            const formData = new FormData();
-            const fileInput = document.getElementById('imageFile');
+            // Show preview
+            elements.previewImg.src = capturedImageData;
+            elements.imagePreview.classList.remove('d-none');
+            elements.uploadBtn.disabled = false;
             
-            if (!fileInput.files[0]) {
-                showError('Please select an image file');
+            // Clear file input
+            elements.fileInput.value = '';
+            currentImageFile = null;
+
+            hideError();
+        }
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+
+            elements.cameraFeed.classList.add('d-none');
+            elements.cameraPlaceholder.classList.remove('d-none');
+            elements.startCameraBtn.classList.remove('d-none');
+            elements.captureBtn.classList.add('d-none');
+            elements.stopCameraBtn.classList.add('d-none');
+        }
+
+        // File handling functions
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff'];
+            if (!allowedTypes.includes(file.type)) {
+                showError('Invalid file type. Please select a supported image format.');
                 return;
             }
-            
-            formData.append('file', fileInput.files[0]);
-            
-            // Show loading spinner
-            document.getElementById('loadingSpinner').classList.remove('d-none');
-            document.getElementById('results').classList.add('d-none');
-            document.getElementById('errorMessage').classList.add('d-none');
-            
-            fetch('/predict', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('loadingSpinner').classList.add('d-none');
-                
-                if (data.success) {
-                    showResults(data);
-                } else {
-                    showError(data.error || 'Unknown error occurred');
-                }
-            })
-            .catch(error => {
-                document.getElementById('loadingSpinner').classList.add('d-none');
-                showError('Network error: ' + error.message);
-            });
-        });
 
-        function showResults(data) {
-            document.getElementById('predictedClass').textContent = data.predicted_class;
-            document.getElementById('confidence').textContent = (data.confidence * 100).toFixed(2);
-            
-            // Show all predictions
-            const container = document.getElementById('allPredictions');
-            container.innerHTML = '';
-            
-            data.all_predictions.forEach((pred, index) => {
-                const col = document.createElement('div');
-                col.className = 'col-md-12 mb-2';
+            // Validate file size (32MB)
+            if (file.size > 32 * 1024 * 1024) {
+                showError('File too large. Maximum size is 32MB.');
+                return;
+            }
+
+            currentImageFile = file;
+            capturedImageData = null;
+
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                elements.previewImg.src = e.target.result;
+                elements.imagePreview.classList.remove('d-none');
+                elements.uploadBtn.disabled = false;
+            };
+            reader.onerror = function() {
+                showError('Error reading file. The file may be corrupted.');
+                resetUploadState();
+            };
+            reader.readAsDataURL(file);
+
+            hideError();
+        }
+
+        // Image processing
+        async function processImage() {
+            if (!currentImageFile && !capturedImageData) {
+                showError('Please select an image or capture from camera first.');
+                return;
+            }
+
+            showLoading(true);
+            hideError();
+
+            try {
+                let response;
+
+                if (capturedImageData) {
+                    // Process camera capture
+                    response = await fetch('/inspect', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            image: capturedImageData
+                        })
+                    });
+                } else {
+                    // Process file upload
+                    const formData = new FormData();
+                    formData.append('file', currentImageFile);
+
+                    response = await fetch('/inspect', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result);
+                } else {
+                    showError(result.error || 'Unknown error occurred during analysis');
+                }
+            } catch (error) {
+                console.error('Error processing image:', error);
+                showError('Network error occurred. Please try again.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Results display
+        function displayResults(result) {
+            elements.noResults.classList.add('d-none');
+            elements.resultsContainer.classList.remove('d-none');
+
+            // Main result
+            document.getElementById('vegetableType').textContent = result.vegetable_type;
+            document.getElementById('qualityCategory').textContent = result.quality_info.label;
+            document.getElementById('qualityCategory').style.color = result.quality_info.color;
+            document.getElementById('qualityDescription').textContent = result.quality_info.description;
+            document.getElementById('qualityScore').textContent = result.quality_score;
+
+            // Style quality score circle
+            const scoreCircle = document.querySelector('.quality-score-circle');
+            scoreCircle.style.borderColor = result.quality_info.color;
+            scoreCircle.style.color = result.quality_info.color;
+
+            // Vegetable predictions
+            const predictionsContainer = document.getElementById('vegetablePredictions');
+            predictionsContainer.innerHTML = '';
+
+            result.vegetable_predictions.forEach((pred, index) => {
+                const confidence = (pred.confidence * 100).toFixed(1);
+                const isTop = index === 0;
                 
-                const confidence = (pred.confidence * 100).toFixed(2);
-                const progressClass = index === 0 ? 'bg-success' : 'bg-info';
-                
-                col.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>${pred.class}</span>
-                        <span>${confidence}%</span>
+                const predictionDiv = document.createElement('div');
+                predictionDiv.className = 'prediction-item mb-2';
+                predictionDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="${isTop ? 'fw-bold' : ''}">${pred.vegetable}</span>
+                        <span class="badge ${isTop ? 'bg-primary' : 'bg-secondary'}">${confidence}%</span>
                     </div>
-                    <div class="progress" style="height: 20px;">
-                        <div class="progress-bar ${progressClass}" style="width: ${confidence}%"></div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar ${isTop ? 'bg-primary' : 'bg-secondary'}" 
+                             style="width: ${confidence}%"></div>
                     </div>
                 `;
-                container.appendChild(col);
+                predictionsContainer.appendChild(predictionDiv);
             });
-            
-            document.getElementById('results').classList.remove('d-none');
+
+            // Timestamp
+            const timestamp = new Date(result.timestamp).toLocaleString();
+            document.getElementById('timestamp').textContent = timestamp;
+        }
+
+        // System information
+        async function loadSystemInformation() {
+            try {
+                const [vegetablesResponse, categoriesResponse] = await Promise.all([
+                    fetch('/vegetables'),
+                    fetch('/quality-categories')
+                ]);
+
+                const vegetablesData = await vegetablesResponse.json();
+                const categoriesData = await categoriesResponse.json();
+
+                displaySupportedVegetables(vegetablesData.vegetables);
+                displayQualityCategories(categoriesData.categories);
+            } catch (error) {
+                console.error('Error loading system information:', error);
+            }
+        }
+
+        function displaySupportedVegetables(vegetables) {
+            const container = document.getElementById('supportedVegetables');
+            container.innerHTML = '';
+
+            vegetables.forEach(vegetable => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-light text-dark';
+                badge.textContent = vegetable;
+                container.appendChild(badge);
+            });
+        }
+
+        function displayQualityCategories(categories) {
+            const container = document.getElementById('qualityCategories');
+            container.innerHTML = '';
+
+            Object.entries(categories).forEach(([key, category]) => {
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.style.backgroundColor = category.color;
+                badge.style.color = 'white';
+                badge.textContent = category.label;
+                container.appendChild(badge);
+            });
+        }
+
+        async function checkSystemHealth() {
+            try {
+                const response = await fetch('/health');
+                const health = await response.json();
+                
+                const statusBadge = document.getElementById('systemStatus');
+                if (health.model_loaded) {
+                    statusBadge.className = 'badge bg-success';
+                    statusBadge.textContent = 'Online';
+                } else {
+                    statusBadge.className = 'badge bg-warning';
+                    statusBadge.textContent = 'Model Not Loaded';
+                }
+            } catch (error) {
+                const statusBadge = document.getElementById('systemStatus');
+                statusBadge.className = 'badge bg-danger';
+                statusBadge.textContent = 'Offline';
+            }
+        }
+
+        // Utility functions
+        function showLoading(show) {
+            elements.loadingSpinner.classList.toggle('d-none', !show);
+            elements.uploadBtn.disabled = show;
         }
 
         function showError(message) {
-            document.getElementById('errorText').textContent = message;
-            document.getElementById('errorMessage').classList.remove('d-none');
+            elements.errorMessage.textContent = message;
+            elements.errorAlert.classList.remove('d-none');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                hideError();
+            }, 5000);
         }
+
+        function hideError() {
+            elements.errorAlert.classList.add('d-none');
+        }
+
+        function resetUploadState() {
+            elements.fileInput.value = '';
+            elements.imagePreview.classList.add('d-none');
+            elements.uploadBtn.disabled = true;
+            currentImageFile = null;
+            capturedImageData = null;
+        }
+
+        // Handle page visibility for camera cleanup
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && cameraStream) {
+                stopCamera();
+            }
+        });
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (cameraStream) {
+                stopCamera();
+            }
+        });
     </script>
 </body>
 </html>
